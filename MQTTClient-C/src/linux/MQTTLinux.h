@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * Copyright (c) 2014 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
@@ -46,6 +46,18 @@
 #include <string.h>
 #include <signal.h>
 
+#define MBEDTLS_ENABLE
+
+#ifdef MBEDTLS_ENABLE
+#include <mbedtls/net_sockets.h>
+#include <mbedtls/ssl.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/debug.h>
+
+#include <mbedtls/error.h>
+#endif
+
 typedef struct Timer
 {
 	struct timeval end_time;
@@ -59,7 +71,16 @@ int TimerLeftMS(Timer*);
 
 typedef struct Network
 {
+#ifdef MBEDTLS_ENABLE
+  mbedtls_net_context conn_ctx;
+  mbedtls_entropy_context entropy;
+  mbedtls_ctr_drbg_context ctr_drbg;
+  mbedtls_ssl_context ssl;
+  mbedtls_ssl_config conf;
+  mbedtls_x509_crt cacert;
+#else
 	int my_socket;
+#endif
 	int (*mqttread) (struct Network*, unsigned char*, int, int);
 	int (*mqttwrite) (struct Network*, unsigned char*, int, int);
 } Network;
@@ -67,6 +88,7 @@ typedef struct Network
 int linux_read(Network*, unsigned char*, int, int);
 int linux_write(Network*, unsigned char*, int, int);
 
+DLLExport void NetworkExit(Network *);
 DLLExport void NetworkInit(Network*);
 DLLExport int NetworkConnect(Network*, char*, int);
 DLLExport void NetworkDisconnect(Network*);

@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * Copyright (c) 2014, 2017 IBM Corp.
  *
  * All rights reserved. This program and the accompanying materials
@@ -34,6 +34,7 @@
   #define DLLExport
 #endif
 
+#include "MQTTLinux.h"
 #include "MQTTPacket.h"
 
 #if defined(MQTTCLIENT_PLATFORM_HEADER)
